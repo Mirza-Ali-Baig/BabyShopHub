@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+
+class MyRedirect extends StatelessWidget {
+  final Widget child;
+
+  const MyRedirect({super.key, required this.child});
+
+  void _redirect(BuildContext context) {
+    Navigator.push(
+      context,
+      PageTransition(
+        type: PageTransitionType.size,
+        alignment: Alignment.bottomCenter,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _redirect(context),
+      child: Container(
+        // You can style this container as needed
+        child: const Text('Tap to Redirect'),
+      ),
+    );
+  }
+}
+
+Future redirect(context, Widget child) {
+  return Navigator.push(
+    context,
+    PageTransition(
+      type: PageTransitionType.size,
+      alignment: Alignment.bottomCenter,
+      child: child,
+    ),
+  );
+}
