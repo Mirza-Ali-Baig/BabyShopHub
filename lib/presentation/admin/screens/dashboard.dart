@@ -1,7 +1,10 @@
-import 'package:baby_shop_hub/res/assets_res.dart';
+import 'package:baby_shop_hub/utils/my_redirect.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fl_chart/fl_chart.dart';
+
+import '../components/my_appbar.dart';
+import 'category_screen.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -11,76 +14,11 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.pink.shade300, Colors.purple.shade300],
-            ),
-          ),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Image.asset(
-                AssetsRes.LOGO,
-                height: 30,
-              ),
-            ),
-            const SizedBox(width: 15),
-            Text(
-              'Welcome Admin',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                shadows: [
-                  Shadow(
-                    blurRadius: 2,
-                    color: Colors.black.withOpacity(0.3),
-                    offset: const Offset(1, 1),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              // Handle notification action
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () {
-              // Handle profile action
-            },
-          ),
-        ],
-      ),
+      appBar: const MyAppbar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -120,12 +58,9 @@ class _DashboardState extends State<Dashboard> {
             label: 'Users',
           ),
         ],
-        currentIndex: _currentIndex,
+        currentIndex: 0,
         selectedItemColor: Colors.pink,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
           // Navigate to the corresponding screen based on the index
           switch (index) {
             case 0:
@@ -135,13 +70,16 @@ class _DashboardState extends State<Dashboard> {
               Navigator.pushNamed(context, '/orders');
               break;
             case 2:
-              Navigator.pushNamed(context, '/reviews');
+              Navigator.pushNamed(context, '/products');
               break;
             case 3:
-              Navigator.pushNamed(context, '/users');
+              redirect(context, const CategoryScreen());
               break;
             case 4:
-              Navigator.pushNamed(context, '/products');
+              Navigator.pushNamed(context, '/reviews');
+              break;
+            case 5:
+              Navigator.pushNamed(context, '/users');
               break;
           }
         },
@@ -316,19 +254,52 @@ class OverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: Theme.of(context).primaryColor),
-            const SizedBox(height: 8),
-            Text(title, style: const TextStyle(fontSize: 16)),
-            Text('$count', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 600;
+        return Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Theme.of(context).primaryColor.withOpacity(0.7), Theme.of(context).primaryColor],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: isSmallScreen ? 28 : 36, color: Colors.white),
+                  SizedBox(height: isSmallScreen ? 6 : 10),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 14 : 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: isSmallScreen ? 4 : 6),
+                  Text(
+                    '$count',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 18 : 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -447,68 +418,126 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Column(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-              child: Image.network(product.image, fit: BoxFit.cover),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 600;
+        return Card(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: InkWell(
+            onTap: () {
+              // Implement product details action
+            },
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(product.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(
-                  product.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 14),
+                Expanded(
+                  flex: 3,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Hero(
+                        tag: 'product-${product.title}',
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                          child: Image.network(
+                            product.image,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(child: CircularProgressIndicator());
+                            },
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            product.price,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                        const SizedBox(width: 4),
-                        Text('${product.reviews} reviews', style: const TextStyle(fontSize: 14)),
+                        Text(
+                          product.title,
+                          style: TextStyle(fontSize: isSmallScreen ? 14 : 16, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          product.description,
+                          style: TextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey[600]),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(Icons.star, color: Colors.amber, size: isSmallScreen ? 14 : 18),
+                                  const SizedBox(width: 2),
+                                  Flexible(
+                                    child: Text(
+                                      '${product.reviews} reviews',
+                                      style: TextStyle(fontSize: isSmallScreen ? 10 : 12),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit, size: isSmallScreen ? 18 : 22),
+                                  onPressed: () {
+                                    // Implement edit action
+                                  },
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, size: isSmallScreen ? 18 : 22),
+                                  onPressed: () {
+                                    // Implement delete action
+                                  },
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                    Text(product.price, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  // Implement edit action
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  // Implement delete action
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
+        );
+      },
     );
   }
 }
