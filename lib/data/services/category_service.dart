@@ -47,18 +47,29 @@ class CategoryService {
     }
   }
 
-  // Get all categories
+  // Get all categories 
   Future<List<CategoryModel>> getCategories() async {
     QuerySnapshot snapshot = await _firestore.collection('categories').get();
     return snapshot.docs.map((doc) {
       return CategoryModel.fromMap(doc.data() as Map<String, dynamic>,doc.id);
     }).toList();
   }
-  Future test() async {
-    QuerySnapshot snapshot = await _firestore.collection('categories').get();
-    return snapshot.docs.map((doc) {
-      return doc;
-    }).toList();
+  // Get a category by its ID
+  Future<CategoryModel> getCategoryById(String id) async {
+    try {
+      DocumentSnapshot snapshot = await _firestore.collection('categories').doc(id).get();
+      if (!snapshot.exists) {
+        throw Exception('Category with ID $id does not exist');
+      }
+      print("Category retrieved successfully: ${snapshot.data()}");
+      return CategoryModel.fromMap(snapshot.data() as Map<String, dynamic>, snapshot.id);
+    } on FirebaseException catch (e) {
+      print('Error getting category by ID: $e');
+      throw Exception('Failed to get category by ID: ${e.message}');
+    } catch (e) {
+      print('Unexpected error: $e');
+      throw Exception('Failed to get category by ID due to an unexpected error');
+    }
   }
 
   // Delete a category

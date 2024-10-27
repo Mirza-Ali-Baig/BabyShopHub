@@ -1,8 +1,10 @@
+import 'package:baby_shop_hub/data/models/product_model.dart';
 import 'package:baby_shop_hub/utils/my_redirect.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import '../../../data/models/review_model.dart';
 import '../components/my_appbar.dart';
 import 'category_screen.dart';
 
@@ -332,34 +334,18 @@ class ChartsSection extends StatelessWidget {
 // Recent Products Section Widget
 
 class RecentProductsSection extends StatelessWidget {
-  final List<Product> products = [
-    Product(
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+  final List<ProductModel> products = [
+    ProductModel(
+      id: "1",
+      categoryID: "1",
+      quantity: 100,
+      thumbnail: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      images: ['https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'],
+      createdAt: DateTime.now(),
       title: 'Product 1',
       description: 'This is a short description of Product 1.',
-      reviews: 25,
-      price: '\$20',
-    ),
-    Product(
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      title: 'Product 2',
-      description: 'This is a short description of Product 2.',
-      reviews: 15,
-      price: '\$30',
-    ),
-    Product(
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      title: 'Product 2',
-      description: 'This is a short description of Product 2.',
-      reviews: 15,
-      price: '\$30',
-    ),
-    Product(
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      title: 'Product 2',
-      description: 'This is a short description of Product 2.',
-      reviews: 15,
-      price: '\$30',
+      reviews: [ReviewModel(userId: "1", comment: "This is a great product!", rating: 5, date: DateTime.now())],
+      price: 20.0,
     ),
     // Add more product instances as needed
   ];
@@ -412,7 +398,7 @@ class Product {
 
 // Product Card Widget
 class ProductCard extends StatelessWidget {
-  final Product product;
+  final ProductModel product;
 
   const ProductCard({super.key, required this.product});
 
@@ -441,7 +427,7 @@ class ProductCard extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                           child: Image.network(
-                            product.image,
+                            product.thumbnail,
                             fit: BoxFit.cover,
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
@@ -460,7 +446,7 @@ class ProductCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
-                            product.price,
+                            "\$ ${product.price.toString()}",
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -478,15 +464,32 @@ class ProductCard extends StatelessWidget {
                       children: [
                         Text(
                           product.title,
-                          style: TextStyle(fontSize: isSmallScreen ? 14 : 16, fontWeight: FontWeight.bold),
-                          maxLines: 1,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           product.description,
-                          style: TextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey[600]),
+                          style: Theme.of(context).textTheme.bodyMedium,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Category: ${product.categoryID}',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'Quantity: ${product.quantity}',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -498,7 +501,7 @@ class ProductCard extends StatelessWidget {
                                   const SizedBox(width: 2),
                                   Flexible(
                                     child: Text(
-                                      '${product.reviews} reviews',
+                                      '${product.reviews.length} reviews',
                                       style: TextStyle(fontSize: isSmallScreen ? 10 : 12),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -510,25 +513,24 @@ class ProductCard extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.edit, size: isSmallScreen ? 18 : 22),
+                                  icon: const Icon(Icons.edit, size: 18),
+                                  padding: EdgeInsets.zero,
                                   onPressed: () {
                                     // Implement edit action
                                   },
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.delete, size: isSmallScreen ? 18 : 22),
+                                  icon: const Icon(Icons.delete, size: 18),
+                                  padding: EdgeInsets.zero,
                                   onPressed: () {
                                     // Implement delete action
                                   },
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
                                 ),
                               ],
                             ),
                           ],
                         ),
+                        
                       ],
                     ),
                   ),
@@ -688,23 +690,23 @@ class OrderCard extends StatelessWidget {
 class RecentReviewsSection extends StatelessWidget {
    RecentReviewsSection({super.key});
 
-  final List<Review> reviews = [
-    Review(
-      reviewer: 'Alice',
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      reviewText: 'Great product! Really happy with my purchase.',
+  final List<ReviewModel> reviews = [
+    ReviewModel(
+      userId: 'Alice',
+      comment: 'Great product! Really happy with my purchase.',
+      date: DateTime.now(),
       rating: 5,
     ),
-    Review(
-      reviewer: 'Bob',
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      reviewText: 'Okay, but it could be better.',
+    ReviewModel(
+      userId: 'Bob',
+      comment: 'Okay, but it could be better.',
+      date: DateTime.now(),
       rating: 3,
     ),
-    Review(
-      reviewer: 'Charlie',
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      reviewText: 'Absolutely fantastic! Highly recommend.',
+    ReviewModel(
+      userId: 'Charlie',
+      comment: 'Absolutely fantastic! Highly recommend.',
+      date: DateTime.now(),
       rating: 5,
     ),
     // Add more reviews as needed
@@ -733,24 +735,10 @@ class RecentReviewsSection extends StatelessWidget {
   }
 }
 
-// Review Class
-class Review {
-  final String reviewer;
-  final String image;
-  final String reviewText;
-  final int rating;
-
-  Review({
-    required this.reviewer,
-    required this.image,
-    required this.reviewText,
-    required this.rating,
-  });
-}
 
 // Review Card Widget
 class ReviewCard extends StatelessWidget {
-  final Review review;
+  final ReviewModel review;
 
   const ReviewCard({super.key, required this.review});
 
@@ -766,17 +754,17 @@ class ReviewCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(review.image, width: 60, height: 60, fit: BoxFit.cover),
+              child: Image.network(review.userId, width: 60, height: 60, fit: BoxFit.cover),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(review.reviewer, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(review.userId, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   const SizedBox(height: 4),
                   Text(
-                    review.reviewText,
+                    review.comment,
                     style: const TextStyle(fontSize: 14),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -784,7 +772,7 @@ class ReviewCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: List.generate(
-                      review.rating,
+                      int.parse(review.rating.toString()),
                       (index) => const Icon(Icons.star, color: Colors.amber, size: 16),
                     ),
                   ),

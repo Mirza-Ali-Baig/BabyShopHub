@@ -1,8 +1,11 @@
+import 'package:baby_shop_hub/Core/Theme/my_theme.dart';
 import 'package:baby_shop_hub/firebase_options.dart';
-import 'package:baby_shop_hub/presentation/admin/screens/category_screen.dart';
-import 'package:baby_shop_hub/presentation/admin/screens/dashboard.dart';
+import 'package:baby_shop_hub/presentation/admin/screens/products_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
+
+// import 'presentation/admin/screens/products_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,12 +21,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home:  const CategoryScreen(),
+      title: 'Baby Shop Hub',
+      darkTheme: MyTheme.dark(),
+      theme: MyTheme.light(),
+      themeMode: ThemeMode.system,
+      home: const ProductsScreen()  ,
     );
   }
 }
